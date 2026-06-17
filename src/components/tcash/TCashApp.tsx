@@ -264,16 +264,6 @@ export function TCashApp() {
 
       <BottomNav tab={tab} setTab={setTab} />
 
-      {/* FAB only on Home */}
-      {tab === "home" && (
-        <button
-          onClick={() => setAddOpen(true)}
-          aria-label="Add balance"
-          className="fixed bottom-24 right-[max(1rem,calc(50%-14rem))] z-30 h-16 w-16 rounded-full bg-gradient-primary text-primary-foreground shadow-fab grid place-items-center tap-scale"
-        >
-          <Icon.Plus className="h-7 w-7" />
-        </button>
-      )}
 
       {/* Drawer menu */}
       {menuOpen && (
