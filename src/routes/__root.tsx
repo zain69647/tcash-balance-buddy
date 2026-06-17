@@ -86,15 +86,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { name: "apple-mobile-web-app-title", content: "T-Cash" },
-      { title: "T-Cash Tracker — Bus Card Balance & Fare Log" },
+      { title: "T-Cash Tracker" },
       {
         name: "description",
         content:
           "Track your T-Cash bus card balance, fares and trips offline. Works as a PWA on Android.",
       },
       { property: "og:title", content: "T-Cash Tracker" },
-      { property: "og:description", content: "Offline T-Cash bus card balance & fare tracker." },
+      { property: "og:description", content: "T-Cash Tracker is a mobile-first PWA for manually tracking your T-Cash card balance and transactions offline." },
       { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "T-Cash Tracker" },
+      { name: "description", content: "T-Cash Tracker is a mobile-first PWA for manually tracking your T-Cash card balance and transactions offline." },
+      { name: "twitter:description", content: "T-Cash Tracker is a mobile-first PWA for manually tracking your T-Cash card balance and transactions offline." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/6e14cf5c-9f5c-448f-9d4f-07f430ca2564/id-preview-ce5aa5e5--d94476f4-14fa-4dfc-bcd7-bafe6bec29b9.lovable.app-1781689131948.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/6e14cf5c-9f5c-448f-9d4f-07f430ca2564/id-preview-ce5aa5e5--d94476f4-14fa-4dfc-bcd7-bafe6bec29b9.lovable.app-1781689131948.png" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
