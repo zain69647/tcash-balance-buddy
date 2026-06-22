@@ -127,6 +127,7 @@ export function TCashApp() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [atmOpen, setAtmOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const [lastUndone, setLastUndone] = useState<Tx | null>(null);
 
   // Hydrate from localStorage (client only)
