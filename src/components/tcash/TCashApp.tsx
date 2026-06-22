@@ -1218,3 +1218,39 @@ function download(blob: Blob, name: string) {
   a.click();
   URL.revokeObjectURL(url);
 }
+
+// =================== About sheet ===================
+function AboutSheet({ onClose }: { onClose: () => void }) {
+  return (
+    <Sheet title="About this app" onClose={onClose}>
+      <div className="space-y-3 text-sm leading-relaxed">
+        <p>
+          You can <b>manually track your balance</b> in your T-Cash card using this application.
+        </p>
+        <p>
+          Simply add funds as much as you think your card has. Then cut balance by tapping on the{" "}
+          <span className="font-semibold text-[color:var(--destructive)]">red button</span>{" "}
+          <span className="text-muted-foreground">(default Rs. 30)</span>. By doing this you can track your balance 😉
+        </p>
+        <div className="rounded-xl bg-muted p-3 space-y-2">
+          <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            Important Note
+          </div>
+          <p>
+            This application is <b>not official</b> — it is not connected with your card. It was built to help you remember the usage of the card.
+          </p>
+          <p>
+            It is <b>totally offline</b>. Internet 🛜 is only required the first time to load the app.
+          </p>
+          <p className="font-semibold">100% secure & safe.</p>
+        </div>
+        <button
+          onClick={onClose}
+          className="w-full rounded-xl bg-gradient-primary text-primary-foreground py-3 font-bold tap-scale"
+        >
+          Got it
+        </button>
+      </div>
+    </Sheet>
+  );
+}
