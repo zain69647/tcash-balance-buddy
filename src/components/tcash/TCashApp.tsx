@@ -807,48 +807,8 @@ function SettingsView({
   showToast: (m: string) => void;
   clearAll: () => void;
 }) {
-  const fileRef = useRef<HTMLInputElement>(null);
-
   const update = <K extends keyof Settings>(k: K, v: Settings[K]) =>
     setSettings((s) => ({ ...s, [k]: v }));
-
-  const exportJson = () => {
-    const blob = new Blob([JSON.stringify({ settings, tx }, null, 2)], {
-      type: "application/json",
-    });
-    download(blob, `tcash-backup-${Date.now()}.json`);
-    showToast("JSON exported");
-  };
-  const exportCsv = () => {
-    const rows = [
-      ["id", "date", "time", "type", "amount", "balance_after", "note"],
-      ...tx.map((t) => [
-        t.id,
-        fmtDate(t.timestamp),
-        fmtTime(t.timestamp),
-        t.type,
-        String(t.amount),
-        String(t.balanceAfter),
-        (t.note ?? "").replace(/,/g, " "),
-      ]),
-    ];
-    const csv = rows.map((r) => r.join(",")).join("\n");
-    download(new Blob([csv], { type: "text/csv" }), `tcash-history-${Date.now()}.csv`);
-    showToast("CSV exported");
-  };
-  const importFile = async (f: File) => {
-    try {
-      const text = await f.text();
-      const parsed = JSON.parse(text);
-      if (parsed.tx && Array.isArray(parsed.tx)) {
-        setTx(parsed.tx);
-        if (parsed.settings) setSettings({ ...DEFAULT_SETTINGS, ...parsed.settings });
-        showToast("Backup restored");
-      } else throw new Error("Invalid file");
-    } catch {
-      showToast("Could not import file");
-    }
-  };
 
   const fareOptions = [20, 25, 30, 40, 50];
   const lowOptions = [50, 100, 150, 200];
