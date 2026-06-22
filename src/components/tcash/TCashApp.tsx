@@ -889,15 +889,6 @@ function SettingsView({
         </div>
       </Section>
 
-      <Section title="Currency">
-        <div className="flex gap-2">
-          {(["PKR", "USD", "EUR"] as const).map((c) => (
-            <Chip key={c} active={settings.currency === c} onClick={() => update("currency", c)}>
-              {c}
-            </Chip>
-          ))}
-        </div>
-      </Section>
 
       <Section title="Appearance">
         <button
