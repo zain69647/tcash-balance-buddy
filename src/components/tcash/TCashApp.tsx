@@ -912,39 +912,6 @@ function SettingsView({
         </button>
       </Section>
 
-      <Section title="Backup & restore">
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={exportJson}
-            className="flex items-center justify-center gap-2 rounded-xl bg-card border border-border py-3 text-sm font-semibold tap-scale"
-          >
-            <Icon.Download className="h-4 w-4" /> JSON
-          </button>
-          <button
-            onClick={exportCsv}
-            className="flex items-center justify-center gap-2 rounded-xl bg-card border border-border py-3 text-sm font-semibold tap-scale"
-          >
-            <Icon.Download className="h-4 w-4" /> CSV
-          </button>
-        </div>
-        <input
-          ref={fileRef}
-          type="file"
-          accept="application/json"
-          className="hidden"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) importFile(f);
-            e.target.value = "";
-          }}
-        />
-        <button
-          onClick={() => fileRef.current?.click()}
-          className="w-full flex items-center justify-center gap-2 rounded-xl bg-card border border-border py-3 text-sm font-semibold tap-scale"
-        >
-          <Icon.Upload className="h-4 w-4" /> Restore from JSON
-        </button>
-      </Section>
 
       <Section title="Danger zone">
         <button
