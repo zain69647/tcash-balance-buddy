@@ -308,6 +308,9 @@ export function TCashApp() {
         />
       )}
 
+      {/* About sheet */}
+      {aboutOpen && <AboutSheet onClose={() => setAboutOpen(false)} />}
+
       {/* Toast */}
       {toast && (
         <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-foreground/95 text-background text-sm font-medium px-4 py-2 rounded-full shadow-soft animate-slide-up">
