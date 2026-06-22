@@ -113,6 +113,9 @@ const Icon = {
   Moon: (p: any) => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
   ),
+  Info: (p: any) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+  ),
 };
 
 // =================== Root App ===================
@@ -127,6 +130,7 @@ export function TCashApp() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [atmOpen, setAtmOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const [lastUndone, setLastUndone] = useState<Tx | null>(null);
 
   // Hydrate from localStorage (client only)
@@ -279,6 +283,10 @@ export function TCashApp() {
             setMenuOpen(false);
             setAtmOpen(true);
           }}
+          onAbout={() => {
+            setMenuOpen(false);
+            setAboutOpen(true);
+          }}
         />
       )}
 
@@ -302,6 +310,9 @@ export function TCashApp() {
           onClose={() => setAtmOpen(false)}
         />
       )}
+
+      {/* About sheet */}
+      {aboutOpen && <AboutSheet onClose={() => setAboutOpen(false)} />}
 
       {/* Toast */}
       {toast && (
@@ -799,48 +810,8 @@ function SettingsView({
   showToast: (m: string) => void;
   clearAll: () => void;
 }) {
-  const fileRef = useRef<HTMLInputElement>(null);
-
   const update = <K extends keyof Settings>(k: K, v: Settings[K]) =>
     setSettings((s) => ({ ...s, [k]: v }));
-
-  const exportJson = () => {
-    const blob = new Blob([JSON.stringify({ settings, tx }, null, 2)], {
-      type: "application/json",
-    });
-    download(blob, `tcash-backup-${Date.now()}.json`);
-    showToast("JSON exported");
-  };
-  const exportCsv = () => {
-    const rows = [
-      ["id", "date", "time", "type", "amount", "balance_after", "note"],
-      ...tx.map((t) => [
-        t.id,
-        fmtDate(t.timestamp),
-        fmtTime(t.timestamp),
-        t.type,
-        String(t.amount),
-        String(t.balanceAfter),
-        (t.note ?? "").replace(/,/g, " "),
-      ]),
-    ];
-    const csv = rows.map((r) => r.join(",")).join("\n");
-    download(new Blob([csv], { type: "text/csv" }), `tcash-history-${Date.now()}.csv`);
-    showToast("CSV exported");
-  };
-  const importFile = async (f: File) => {
-    try {
-      const text = await f.text();
-      const parsed = JSON.parse(text);
-      if (parsed.tx && Array.isArray(parsed.tx)) {
-        setTx(parsed.tx);
-        if (parsed.settings) setSettings({ ...DEFAULT_SETTINGS, ...parsed.settings });
-        showToast("Backup restored");
-      } else throw new Error("Invalid file");
-    } catch {
-      showToast("Could not import file");
-    }
-  };
 
   const fareOptions = [20, 25, 30, 40, 50];
   const lowOptions = [50, 100, 150, 200];
@@ -881,15 +852,6 @@ function SettingsView({
         </div>
       </Section>
 
-      <Section title="Currency">
-        <div className="flex gap-2">
-          {(["PKR", "USD", "EUR"] as const).map((c) => (
-            <Chip key={c} active={settings.currency === c} onClick={() => update("currency", c)}>
-              {c}
-            </Chip>
-          ))}
-        </div>
-      </Section>
 
       <Section title="Appearance">
         <button
@@ -913,39 +875,6 @@ function SettingsView({
         </button>
       </Section>
 
-      <Section title="Backup & restore">
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={exportJson}
-            className="flex items-center justify-center gap-2 rounded-xl bg-card border border-border py-3 text-sm font-semibold tap-scale"
-          >
-            <Icon.Download className="h-4 w-4" /> JSON
-          </button>
-          <button
-            onClick={exportCsv}
-            className="flex items-center justify-center gap-2 rounded-xl bg-card border border-border py-3 text-sm font-semibold tap-scale"
-          >
-            <Icon.Download className="h-4 w-4" /> CSV
-          </button>
-        </div>
-        <input
-          ref={fileRef}
-          type="file"
-          accept="application/json"
-          className="hidden"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) importFile(f);
-            e.target.value = "";
-          }}
-        />
-        <button
-          onClick={() => fileRef.current?.click()}
-          className="w-full flex items-center justify-center gap-2 rounded-xl bg-card border border-border py-3 text-sm font-semibold tap-scale"
-        >
-          <Icon.Upload className="h-4 w-4" /> Restore from JSON
-        </button>
-      </Section>
 
       <Section title="Danger zone">
         <button
@@ -1135,12 +1064,14 @@ function SideDrawer({
   onClose,
   onNavigate,
   onAtm,
+  onAbout,
 }: {
   settings: Settings;
   setSettings: (u: Settings | ((s: Settings) => Settings)) => void;
   onClose: () => void;
   onNavigate: (t: Tab) => void;
   onAtm: () => void;
+  onAbout: () => void;
 }) {
   const items: { id: Tab; label: string; icon: any }[] = [
     { id: "home", label: "Dashboard", icon: Icon.Home },
@@ -1177,6 +1108,13 @@ function SideDrawer({
           >
             <Icon.Receipt className="h-5 w-5 text-primary" />
             ATM Balance Check
+          </button>
+          <button
+            onClick={onAbout}
+            className="flex items-center gap-3 rounded-xl px-3 py-3 text-left font-semibold hover:bg-accent tap-scale"
+          >
+            <Icon.Info className="h-5 w-5 text-primary" />
+            About Me
           </button>
         </nav>
         <div className="mt-auto">
@@ -1279,4 +1217,40 @@ function download(blob: Blob, name: string) {
   a.download = name;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+// =================== About sheet ===================
+function AboutSheet({ onClose }: { onClose: () => void }) {
+  return (
+    <Sheet title="About this app" onClose={onClose}>
+      <div className="space-y-3 text-sm leading-relaxed">
+        <p>
+          You can <b>manually track your balance</b> in your T-Cash card using this application.
+        </p>
+        <p>
+          Simply add funds as much as you think your card has. Then cut balance by tapping on the{" "}
+          <span className="font-semibold text-[color:var(--destructive)]">red button</span>{" "}
+          <span className="text-muted-foreground">(default Rs. 30)</span>. By doing this you can track your balance 😉
+        </p>
+        <div className="rounded-xl bg-muted p-3 space-y-2">
+          <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            Important Note
+          </div>
+          <p>
+            This application is <b>not official</b> — it is not connected with your card. It was built to help you remember the usage of the card.
+          </p>
+          <p>
+            It is <b>totally offline</b>. Internet 🛜 is only required the first time to load the app.
+          </p>
+          <p className="font-semibold">100% secure & safe.</p>
+        </div>
+        <button
+          onClick={onClose}
+          className="w-full rounded-xl bg-gradient-primary text-primary-foreground py-3 font-bold tap-scale"
+        >
+          Got it
+        </button>
+      </div>
+    </Sheet>
+  );
 }
