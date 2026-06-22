@@ -1061,12 +1061,14 @@ function SideDrawer({
   onClose,
   onNavigate,
   onAtm,
+  onAbout,
 }: {
   settings: Settings;
   setSettings: (u: Settings | ((s: Settings) => Settings)) => void;
   onClose: () => void;
   onNavigate: (t: Tab) => void;
   onAtm: () => void;
+  onAbout: () => void;
 }) {
   const items: { id: Tab; label: string; icon: any }[] = [
     { id: "home", label: "Dashboard", icon: Icon.Home },
