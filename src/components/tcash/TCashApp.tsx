@@ -280,6 +280,10 @@ export function TCashApp() {
             setMenuOpen(false);
             setAtmOpen(true);
           }}
+          onAbout={() => {
+            setMenuOpen(false);
+            setAboutOpen(true);
+          }}
         />
       )}
 
