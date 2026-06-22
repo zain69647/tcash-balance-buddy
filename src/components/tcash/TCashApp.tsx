@@ -1106,6 +1106,13 @@ function SideDrawer({
             <Icon.Receipt className="h-5 w-5 text-primary" />
             ATM Balance Check
           </button>
+          <button
+            onClick={onAbout}
+            className="flex items-center gap-3 rounded-xl px-3 py-3 text-left font-semibold hover:bg-accent tap-scale"
+          >
+            <Icon.Info className="h-5 w-5 text-primary" />
+            About Me
+          </button>
         </nav>
         <div className="mt-auto">
           <button
