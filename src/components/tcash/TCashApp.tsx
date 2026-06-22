@@ -1225,24 +1225,35 @@ function AboutSheet({ onClose }: { onClose: () => void }) {
     <Sheet title="About this app" onClose={onClose}>
       <div className="space-y-3 text-sm leading-relaxed">
         <p>
-          You can <b>manually track your balance</b> in your T-Cash card using this application.
+          This app helps you <b>keep track of your T-Cash card balance by yourself</b> — right from your phone.
         </p>
-        <p>
-          Simply add funds as much as you think your card has. Then cut balance by tapping on the{" "}
-          <span className="font-semibold text-[color:var(--destructive)]">red button</span>{" "}
-          <span className="text-muted-foreground">(default Rs. 30)</span>. By doing this you can track your balance 😉
-        </p>
+        <div className="rounded-xl bg-muted p-3 space-y-2">
+          <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            How to use it
+          </div>
+          <p>
+            <b>1.</b> Add the amount of money you think is currently on your card.
+          </p>
+          <p>
+            <b>2.</b> Every time you take the bus, tap the{" "}
+            <span className="font-semibold text-[color:var(--destructive)]">red button</span>{" "}
+            to cut the fare <span className="text-muted-foreground">(default Rs. 30)</span>.
+          </p>
+          <p>
+            <b>3.</b> That's it — your balance updates automatically and you always know how much is left. 😉
+          </p>
+        </div>
         <div className="rounded-xl bg-muted p-3 space-y-2">
           <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Important Note
           </div>
           <p>
-            This application is <b>not official</b> — it is not connected with your card. It was built to help you remember the usage of the card.
+            This app is <b>not official</b> and is <b>not connected</b> to your real T-Cash card in any way. It was built simply to help you remember and track your card usage.
           </p>
           <p>
-            It is <b>totally offline</b>. Internet 🛜 is only required the first time to load the app.
+            It works <b>completely offline</b>. You only need the internet 🛜 the <b>first time</b> you open the app — just to load it. After that, everything runs on your phone.
           </p>
-          <p className="font-semibold">100% secure & safe.</p>
+          <p className="font-semibold">Your data stays on your device — 100% secure & safe.</p>
         </div>
         <button
           onClick={onClose}
@@ -1251,6 +1262,7 @@ function AboutSheet({ onClose }: { onClose: () => void }) {
           Got it
         </button>
       </div>
+
     </Sheet>
   );
 }
