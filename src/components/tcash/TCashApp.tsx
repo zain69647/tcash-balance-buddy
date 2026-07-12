@@ -481,7 +481,7 @@ function HomeView({
       {/* Balance card */}
       <div
         className={`relative overflow-hidden rounded-3xl p-5 text-primary-foreground shadow-card ${
-          low ? "bg-gradient-danger" : "bg-gradient-card"
+          low ? "bg-gradient-danger animate-pulse-attention" : "bg-gradient-card"
         }`}
       >
         <div className="absolute -top-12 -right-12 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
@@ -493,7 +493,7 @@ function HomeView({
           </div>
           <div className="mt-3 text-[13px] opacity-85">Current Balance</div>
           <div className="mt-1 text-5xl font-black tracking-tight font-mono">
-            {fmtMoney(balance, settings.currency)}
+            <AnimatedBalance value={balance} currency={settings.currency} />
           </div>
           {low && (
             <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">
