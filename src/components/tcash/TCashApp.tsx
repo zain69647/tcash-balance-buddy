@@ -42,12 +42,6 @@ const fmtDate = (ts: number) =>
     month: "short",
     year: "numeric",
   });
-const fmtTime = (ts: number) =>
-  new Date(ts).toLocaleTimeString("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
 
 function loadTx(): Tx[] {
   try {
@@ -557,7 +551,7 @@ function TxRow({ t, currency }: { t: Tx; currency: string }) {
           )}
         </div>
         <div className="text-xs text-muted-foreground">
-          {fmtDate(t.timestamp)} · {fmtTime(t.timestamp)}
+          {fmtDate(t.timestamp)}
         </div>
       </div>
       <div className="text-right">
@@ -592,7 +586,6 @@ function HistoryView({ tx, settings }: { tx: Tx[]; settings: Settings }) {
         t.note ?? "",
         String(t.amount),
         fmtDate(t.timestamp),
-        fmtTime(t.timestamp),
       ]
         .join(" ")
         .toLowerCase();
@@ -1184,10 +1177,6 @@ function AtmReceipt({
             <div className="flex justify-between">
               <span>Date</span>
               <span>{now.toLocaleDateString("en-GB")}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Time</span>
-              <span>{now.toLocaleTimeString("en-GB", { hour12: true })}</span>
             </div>
             <div className="flex justify-between">
               <span>Ref</span>
