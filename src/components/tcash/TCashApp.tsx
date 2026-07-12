@@ -60,6 +60,57 @@ function loadSettings(): Settings {
   }
 }
 
+function useAnimatedNumber(value: number, duration = 500) {
+  const [display, setDisplay] = useState(value);
+  const prev = useRef(value);
+
+  useEffect(() => {
+    if (value === prev.current) return;
+    const from = prev.current;
+    const to = value;
+    const start = performance.now();
+
+    const animate = (now: number) => {
+      const p = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const current = Math.round(from + (to - from) * eased);
+      setDisplay(current);
+      if (p < 1) requestAnimationFrame(animate);
+    };
+
+    requestAnimationFrame(animate);
+    prev.current = value;
+  }, [value, duration]);
+
+  return display;
+}
+
+function AnimatedBalance({
+  value,
+  currency,
+  className = "",
+}: {
+  value: number;
+  currency: string;
+  className?: string;
+}) {
+  const [flash, setFlash] = useState(false);
+  const display = useAnimatedNumber(value);
+
+  useEffect(() => {
+    if (value === display) return;
+    setFlash(true);
+    const t = setTimeout(() => setFlash(false), 250);
+    return () => clearTimeout(t);
+  }, [value]);
+
+  return (
+    <span className={`inline-block ${flash ? "animate-count-flash" : ""} ${className}`}>
+      {fmtMoney(display, currency)}
+    </span>
+  );
+}
+
 // =================== Icons (inline SVG) ===================
 const Icon = {
   Plus: (p: any) => (
@@ -110,6 +161,12 @@ const Icon = {
   Info: (p: any) => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
   ),
+  Check: (p: any) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M20 6L9 17l-5-5"/></svg>
+  ),
+  Trash: (p: any) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+  ),
 };
 
 // =================== Root App ===================
@@ -126,6 +183,7 @@ export function TCashApp() {
   const [atmOpen, setAtmOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [lastUndone, setLastUndone] = useState<Tx | null>(null);
+  const [pulse, setPulse] = useState<"add" | "deduct" | null>(null);
 
   // Hydrate from localStorage (client only)
   useEffect(() => {
@@ -177,11 +235,18 @@ export function TCashApp() {
     };
     setTx((prev) => [t, ...prev]);
     setLastUndone(null);
+    setPulse(type);
+    setTimeout(() => setPulse(null), 600);
     showToast(
       type === "add"
         ? `Added ${fmtMoney(amount, settings.currency)}`
         : `Fare deducted ${fmtMoney(amount, settings.currency)}`,
     );
+  };
+
+  const deleteTx = (id: string) => {
+    setTx((prev) => prev.filter((t) => t.id !== id));
+    showToast("Transaction deleted");
   };
 
   const undoLast = () => {
@@ -242,10 +307,11 @@ export function TCashApp() {
             lastUndone={lastUndone}
             onRestore={restoreUndone}
             onAtm={() => setAtmOpen(true)}
+            pulse={pulse}
           />
         )}
         {tab === "history" && (
-          <HistoryView tx={tx} settings={settings} />
+          <HistoryView tx={tx} settings={settings} onDelete={deleteTx} />
         )}
         {tab === "stats" && <StatsView tx={tx} settings={settings} />}
         {tab === "settings" && (
@@ -394,6 +460,7 @@ function HomeView({
   lastUndone,
   onRestore,
   onAtm,
+  pulse,
 }: {
   balance: number;
   low: boolean;
@@ -406,6 +473,7 @@ function HomeView({
   lastUndone: Tx | null;
   onRestore: () => void;
   onAtm: () => void;
+  pulse: "add" | "deduct" | null;
 }) {
   const recent = tx.slice(0, 5);
   return (
@@ -413,7 +481,7 @@ function HomeView({
       {/* Balance card */}
       <div
         className={`relative overflow-hidden rounded-3xl p-5 text-primary-foreground shadow-card ${
-          low ? "bg-gradient-danger" : "bg-gradient-card"
+          low ? "bg-gradient-danger animate-pulse-attention" : "bg-gradient-card"
         }`}
       >
         <div className="absolute -top-12 -right-12 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
@@ -425,7 +493,7 @@ function HomeView({
           </div>
           <div className="mt-3 text-[13px] opacity-85">Current Balance</div>
           <div className="mt-1 text-5xl font-black tracking-tight font-mono">
-            {fmtMoney(balance, settings.currency)}
+            <AnimatedBalance value={balance} currency={settings.currency} />
           </div>
           {low && (
             <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">
@@ -453,10 +521,15 @@ function HomeView({
       <div className="grid grid-cols-2 gap-3">
         <button
           onClick={onAdd}
-          className="rounded-2xl bg-gradient-primary text-primary-foreground p-4 flex flex-col items-start gap-2 shadow-soft tap-scale"
+          className="relative overflow-hidden rounded-2xl bg-gradient-primary text-primary-foreground p-4 flex flex-col items-start gap-2 shadow-soft tap-scale-strong"
         >
-          <div className="h-9 w-9 rounded-xl bg-white/20 grid place-items-center">
+          <div className="h-9 w-9 rounded-xl bg-white/20 grid place-items-center relative">
             <Icon.Plus className="h-5 w-5" />
+            {pulse === "add" && (
+              <span className="absolute inset-0 grid place-items-center animate-success-pop">
+                <Icon.Check className="h-5 w-5" />
+              </span>
+            )}
           </div>
           <div className="text-left">
             <div className="font-bold">Add Balance</div>
@@ -465,10 +538,15 @@ function HomeView({
         </button>
         <button
           onClick={() => onDeduct(settings.fare)}
-          className="rounded-2xl bg-gradient-danger text-primary-foreground p-4 flex flex-col items-start gap-2 shadow-soft tap-scale"
+          className="relative overflow-hidden rounded-2xl bg-gradient-danger text-primary-foreground p-4 flex flex-col items-start gap-2 shadow-soft tap-scale-strong"
         >
-          <div className="h-9 w-9 rounded-xl bg-white/20 grid place-items-center">
+          <div className="h-9 w-9 rounded-xl bg-white/20 grid place-items-center relative">
             <Icon.Bus className="h-5 w-5" />
+            {pulse === "deduct" && (
+              <span className="absolute inset-0 grid place-items-center animate-success-pop">
+                <Icon.Check className="h-5 w-5" />
+              </span>
+            )}
           </div>
           <div className="text-left">
             <div className="font-bold">
@@ -527,6 +605,63 @@ function HomeView({
   );
 }
 
+// =================== Swipe to delete row ===================
+function SwipeableRow({
+  children,
+  onDelete,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  onDelete: () => void;
+  delay?: number;
+}) {
+  const [startX, setStartX] = useState<number | null>(null);
+  const [offset, setOffset] = useState(0);
+  const [removing, setRemoving] = useState(false);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setStartX(e.touches[0].clientX);
+  };
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (startX == null) return;
+    const dx = e.touches[0].clientX - startX;
+    if (dx < 0) setOffset(Math.max(dx, -90));
+    else setOffset(0);
+  };
+  const onTouchEnd = () => {
+    if (offset < -55) {
+      setRemoving(true);
+      setTimeout(() => onDelete(), 220);
+    } else {
+      setOffset(0);
+    }
+    setStartX(null);
+  };
+
+  return (
+    <div
+      className="relative overflow-hidden animate-fade-in-up"
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <div className="absolute inset-y-0 right-0 flex items-center justify-end bg-destructive text-destructive-foreground px-5">
+        <Icon.Trash className="h-5 w-5" />
+      </div>
+      <div
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        style={{
+          transform: `translateX(${removing ? "-100%" : `${offset}px`})`,
+          transition: removing || startX == null ? "transform 220ms ease" : "none",
+        }}
+        className="relative bg-card"
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
 // =================== Tx row ===================
 function TxRow({ t, currency }: { t: Tx; currency: string }) {
   const isAdd = t.type === "add";
@@ -572,7 +707,7 @@ function TxRow({ t, currency }: { t: Tx; currency: string }) {
 }
 
 // =================== History ===================
-function HistoryView({ tx, settings }: { tx: Tx[]; settings: Settings }) {
+function HistoryView({ tx, settings, onDelete }: { tx: Tx[]; settings: Settings; onDelete: (id: string) => void }) {
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<"all" | TxType>("all");
 
@@ -637,14 +772,24 @@ function HistoryView({ tx, settings }: { tx: Tx[]; settings: Settings }) {
         </div>
       )}
 
-      {groups.map(([day, items]) => (
-        <section key={day} className="space-y-1.5">
+      {groups.map(([day, items], groupIndex) => (
+        <section
+          key={day}
+          className="space-y-1.5 animate-fade-in-up"
+          style={{ animationDelay: `${groupIndex * 80}ms` }}
+        >
           <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground px-1">
             {day}
           </div>
           <div className="rounded-2xl bg-card border border-border divide-y divide-border overflow-hidden">
-            {items.map((t) => (
-              <TxRow key={t.id} t={t} currency={settings.currency} />
+            {items.map((t, i) => (
+              <SwipeableRow
+                key={t.id}
+                onDelete={() => onDelete(t.id)}
+                delay={groupIndex * 80 + i * 40}
+              >
+                <TxRow t={t} currency={settings.currency} />
+              </SwipeableRow>
             ))}
           </div>
         </section>

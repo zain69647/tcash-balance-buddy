@@ -123,8 +123,18 @@
   .shadow-fab { box-shadow: var(--shadow-fab); }
   .shadow-soft { box-shadow: var(--shadow-soft); }
   .font-mono { font-family: var(--font-mono); }
-  .tap-scale { transition: transform 120ms ease; }
-  .tap-scale:active { transform: scale(0.96); }
+
+  /* Tactile press feedback */
+  .tap-scale {
+    transition: transform 120ms cubic-bezier(0.34, 1.56, 0.64, 1), filter 120ms ease;
+  }
+  .tap-scale:active { transform: scale(0.94); filter: brightness(0.96); }
+
+  .tap-scale-strong {
+    transition: transform 100ms cubic-bezier(0.34, 1.56, 0.64, 1), filter 100ms ease;
+  }
+  .tap-scale-strong:active { transform: scale(0.92); filter: brightness(0.94); }
+
   .safe-bottom { padding-bottom: max(env(safe-area-inset-bottom), 1rem); }
 }
 
@@ -146,3 +156,42 @@
   100% { background-color: transparent; }
 }
 .flash { animation: balance-flash 0.6s ease-out; }
+
+/* Staggered list entry */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  opacity: 0;
+  animation: fade-in-up 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Balance change flash */
+@keyframes count-flash {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+.animate-count-flash { animation: count-flash 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+/* Low balance attention pulse */
+@keyframes pulse-attention {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.35); }
+  50% { transform: scale(1.01); box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+}
+.animate-pulse-attention { animation: pulse-attention 2.2s ease-in-out infinite; }
+
+/* Success check pop on quick actions */
+@keyframes success-pop {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 0; }
+}
+.animate-success-pop { animation: success-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+/* Swipe to delete background */
+@keyframes slide-away {
+  to { transform: translateX(-100%); opacity: 0; }
+}
+.animate-slide-away { animation: slide-away 0.25s ease-out forwards; }
