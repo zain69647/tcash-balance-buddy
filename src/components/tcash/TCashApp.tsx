@@ -460,6 +460,7 @@ function HomeView({
   lastUndone,
   onRestore,
   onAtm,
+  pulse,
 }: {
   balance: number;
   low: boolean;
@@ -472,6 +473,7 @@ function HomeView({
   lastUndone: Tx | null;
   onRestore: () => void;
   onAtm: () => void;
+  pulse: "add" | "deduct" | null;
 }) {
   const recent = tx.slice(0, 5);
   return (
