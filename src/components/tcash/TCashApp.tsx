@@ -307,10 +307,11 @@ export function TCashApp() {
             lastUndone={lastUndone}
             onRestore={restoreUndone}
             onAtm={() => setAtmOpen(true)}
+            pulse={pulse}
           />
         )}
         {tab === "history" && (
-          <HistoryView tx={tx} settings={settings} />
+          <HistoryView tx={tx} settings={settings} onDelete={deleteTx} />
         )}
         {tab === "stats" && <StatsView tx={tx} settings={settings} />}
         {tab === "settings" && (
