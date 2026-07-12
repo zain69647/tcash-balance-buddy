@@ -60,6 +60,57 @@ function loadSettings(): Settings {
   }
 }
 
+function useAnimatedNumber(value: number, duration = 500) {
+  const [display, setDisplay] = useState(value);
+  const prev = useRef(value);
+
+  useEffect(() => {
+    if (value === prev.current) return;
+    const from = prev.current;
+    const to = value;
+    const start = performance.now();
+
+    const animate = (now: number) => {
+      const p = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const current = Math.round(from + (to - from) * eased);
+      setDisplay(current);
+      if (p < 1) requestAnimationFrame(animate);
+    };
+
+    requestAnimationFrame(animate);
+    prev.current = value;
+  }, [value, duration]);
+
+  return display;
+}
+
+function AnimatedBalance({
+  value,
+  currency,
+  className = "",
+}: {
+  value: number;
+  currency: string;
+  className?: string;
+}) {
+  const [flash, setFlash] = useState(false);
+  const display = useAnimatedNumber(value);
+
+  useEffect(() => {
+    if (value === display) return;
+    setFlash(true);
+    const t = setTimeout(() => setFlash(false), 250);
+    return () => clearTimeout(t);
+  }, [value]);
+
+  return (
+    <span className={`inline-block ${flash ? "animate-count-flash" : ""} ${className}`}>
+      {fmtMoney(display, currency)}
+    </span>
+  );
+}
+
 // =================== Icons (inline SVG) ===================
 const Icon = {
   Plus: (p: any) => (
