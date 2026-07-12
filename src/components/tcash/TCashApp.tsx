@@ -705,14 +705,24 @@ function HistoryView({ tx, settings, onDelete }: { tx: Tx[]; settings: Settings;
         </div>
       )}
 
-      {groups.map(([day, items]) => (
-        <section key={day} className="space-y-1.5">
+      {groups.map(([day, items], groupIndex) => (
+        <section
+          key={day}
+          className="space-y-1.5 animate-fade-in-up"
+          style={{ animationDelay: `${groupIndex * 80}ms` }}
+        >
           <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground px-1">
             {day}
           </div>
           <div className="rounded-2xl bg-card border border-border divide-y divide-border overflow-hidden">
-            {items.map((t) => (
-              <TxRow key={t.id} t={t} currency={settings.currency} />
+            {items.map((t, i) => (
+              <SwipeableRow
+                key={t.id}
+                onDelete={() => onDelete(t.id)}
+                delay={groupIndex * 80 + i * 40}
+              >
+                <TxRow t={t} currency={settings.currency} />
+              </SwipeableRow>
             ))}
           </div>
         </section>
