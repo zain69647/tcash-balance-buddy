@@ -640,7 +640,7 @@ function TxRow({ t, currency }: { t: Tx; currency: string }) {
 }
 
 // =================== History ===================
-function HistoryView({ tx, settings }: { tx: Tx[]; settings: Settings }) {
+function HistoryView({ tx, settings, onDelete }: { tx: Tx[]; settings: Settings; onDelete: (id: string) => void }) {
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<"all" | TxType>("all");
 
