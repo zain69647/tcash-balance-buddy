@@ -235,11 +235,18 @@ export function TCashApp() {
     };
     setTx((prev) => [t, ...prev]);
     setLastUndone(null);
+    setPulse(type);
+    setTimeout(() => setPulse(null), 600);
     showToast(
       type === "add"
         ? `Added ${fmtMoney(amount, settings.currency)}`
         : `Fare deducted ${fmtMoney(amount, settings.currency)}`,
     );
+  };
+
+  const deleteTx = (id: string) => {
+    setTx((prev) => prev.filter((t) => t.id !== id));
+    showToast("Transaction deleted");
   };
 
   const undoLast = () => {
