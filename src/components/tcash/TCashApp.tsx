@@ -605,6 +605,63 @@ function HomeView({
   );
 }
 
+// =================== Swipe to delete row ===================
+function SwipeableRow({
+  children,
+  onDelete,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  onDelete: () => void;
+  delay?: number;
+}) {
+  const [startX, setStartX] = useState<number | null>(null);
+  const [offset, setOffset] = useState(0);
+  const [removing, setRemoving] = useState(false);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setStartX(e.touches[0].clientX);
+  };
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (startX == null) return;
+    const dx = e.touches[0].clientX - startX;
+    if (dx < 0) setOffset(Math.max(dx, -90));
+    else setOffset(0);
+  };
+  const onTouchEnd = () => {
+    if (offset < -55) {
+      setRemoving(true);
+      setTimeout(() => onDelete(), 220);
+    } else {
+      setOffset(0);
+    }
+    setStartX(null);
+  };
+
+  return (
+    <div
+      className="relative overflow-hidden animate-fade-in-up"
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <div className="absolute inset-y-0 right-0 flex items-center justify-end bg-destructive text-destructive-foreground px-5">
+        <Icon.Trash className="h-5 w-5" />
+      </div>
+      <div
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        style={{
+          transform: `translateX(${removing ? "-100%" : `${offset}px`})`,
+          transition: removing || startX == null ? "transform 220ms ease" : "none",
+        }}
+        className="relative bg-card"
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
 // =================== Tx row ===================
 function TxRow({ t, currency }: { t: Tx; currency: string }) {
   const isAdd = t.type === "add";
