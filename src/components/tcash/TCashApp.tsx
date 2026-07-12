@@ -521,10 +521,15 @@ function HomeView({
       <div className="grid grid-cols-2 gap-3">
         <button
           onClick={onAdd}
-          className="rounded-2xl bg-gradient-primary text-primary-foreground p-4 flex flex-col items-start gap-2 shadow-soft tap-scale"
+          className="relative overflow-hidden rounded-2xl bg-gradient-primary text-primary-foreground p-4 flex flex-col items-start gap-2 shadow-soft tap-scale-strong"
         >
-          <div className="h-9 w-9 rounded-xl bg-white/20 grid place-items-center">
+          <div className="h-9 w-9 rounded-xl bg-white/20 grid place-items-center relative">
             <Icon.Plus className="h-5 w-5" />
+            {pulse === "add" && (
+              <span className="absolute inset-0 grid place-items-center animate-success-pop">
+                <Icon.Check className="h-5 w-5" />
+              </span>
+            )}
           </div>
           <div className="text-left">
             <div className="font-bold">Add Balance</div>
@@ -533,10 +538,15 @@ function HomeView({
         </button>
         <button
           onClick={() => onDeduct(settings.fare)}
-          className="rounded-2xl bg-gradient-danger text-primary-foreground p-4 flex flex-col items-start gap-2 shadow-soft tap-scale"
+          className="relative overflow-hidden rounded-2xl bg-gradient-danger text-primary-foreground p-4 flex flex-col items-start gap-2 shadow-soft tap-scale-strong"
         >
-          <div className="h-9 w-9 rounded-xl bg-white/20 grid place-items-center">
+          <div className="h-9 w-9 rounded-xl bg-white/20 grid place-items-center relative">
             <Icon.Bus className="h-5 w-5" />
+            {pulse === "deduct" && (
+              <span className="absolute inset-0 grid place-items-center animate-success-pop">
+                <Icon.Check className="h-5 w-5" />
+              </span>
+            )}
           </div>
           <div className="text-left">
             <div className="font-bold">
