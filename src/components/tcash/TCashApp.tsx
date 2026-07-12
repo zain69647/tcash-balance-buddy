@@ -183,6 +183,7 @@ export function TCashApp() {
   const [atmOpen, setAtmOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [lastUndone, setLastUndone] = useState<Tx | null>(null);
+  const [pulse, setPulse] = useState<"add" | "deduct" | null>(null);
 
   // Hydrate from localStorage (client only)
   useEffect(() => {
