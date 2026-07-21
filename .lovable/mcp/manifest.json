@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "sdk_version": "0.24.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "t-cash-tracker-mcp",
+      "version": "0.1.0",
+      "title": "T-Cash Tracker"
+    },
+    "tools": [
+      {
+        "name": "about_app",
+        "title": "About T-Cash Tracker",
+        "description": "Returns a description of the T-Cash Tracker app: what it does, how manual balance tracking works, and its offline-first, not-official disclaimer.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "calculate_rides",
+        "title": "Calculate remaining rides",
+        "description": "Given a current T-Cash balance and a fare per ride (both in PKR), returns how many full rides remain and the leftover balance.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "balance": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Current card balance in PKR."
+            },
+            "fare": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Fare per ride in PKR. Defaults to 30 in the app."
+            }
+          },
+          "required": [
+            "balance",
+            "fare"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

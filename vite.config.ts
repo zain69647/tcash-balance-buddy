@@ -5,6 +5,7 @@
 //     error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
 
 // Allow deploying to Vercel by hard-pinning the Nitro preset when VERCEL=1
 // (Vercel sets this automatically). Locally / on Lovable we leave it as default.
@@ -16,5 +17,7 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: { plugins: [mcpPlugin()] },
   ...(isVercel ? { nitro: { preset: "vercel" } } : {}),
 });
+
